@@ -497,9 +497,16 @@ class TestDefaultSetup (object):
         assert i.canAnnotate(), "Admin can annotate Author's image"
 
         # Login as default "User"
-        # NB: seems this user is not in same group as Author's image.
+        # Retrieve the user ID and create a new group
         gatewaywrapper.loginAsUser()
-        gatewaywrapper.gateway.SERVICE_OPTS.setOmeroGroup('-1')
+        ctx = gatewaywrapper.gateway.getAdminService().getEventContext()
+        uuid = ctx.sessionUuid
+        gatewaywrapper.loginAsAdmin()
+        gid = gatewaywrapper.gateway.createGroup("author-can-edit-test-%s" % uuid,
+                                             member_Ids=[ctx.userId])
+
+        gatewaywrapper.loginAsUser()
+        gatewaywrapper.gateway.setGroupForSession(gid)
         i = gatewaywrapper.gateway.getObject("Image", imageId)
         assert i is None, \
             "User cannot access Author's image in Read-only group"
