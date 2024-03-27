@@ -208,6 +208,7 @@ def testTwoDatasetsChgrpToProject(gatewaywrapper):
     gatewaywrapper.loginAsAdmin()
     gid = gatewaywrapper.gateway.createGroup("chgrp-test-%s" % uuid,
                                              member_Ids=[ctx.userId])
+    gatewaywrapper.doDisconnect()
     gatewaywrapper.loginAsAuthor()
     assert gatewaywrapper.gateway.getObject("Dataset", dataset.id) is not None
 
