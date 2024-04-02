@@ -311,3 +311,10 @@ class TestConnectionMethods(object):
         assert not client.isSecure()
         with BlitzGateway(client_obj=client, secure=True) as conn:
             assert not conn.isSecure()
+
+    def testHost(self, gatewaywrapper):
+        gatewaywrapper.loginAsUser()
+        client = gatewaywrapper.gateway
+        pytest.raises(Exception,
+                      BlitzGateway(client_obj=client,
+                                   host="myserver.com"))
