@@ -502,8 +502,9 @@ class TestDefaultSetup (object):
         ctx = gatewaywrapper.gateway.getAdminService().getEventContext()
         uuid = ctx.sessionUuid
         gatewaywrapper.loginAsAdmin()
-        gid = gatewaywrapper.gateway.createGroup("author-can-edit-test-%s" % uuid,
-                                             member_Ids=[ctx.userId])
+        gname = "author-can-edit-test-%s" % uuid
+        gid = gatewaywrapper.gateway.createGroup(gname,
+                                                 member_Ids=[ctx.userId])
 
         gatewaywrapper.loginAsUser()
         gatewaywrapper.gateway.setGroupForSession(gid)

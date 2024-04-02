@@ -16,6 +16,7 @@ from builtins import object
 from future.utils import native_str
 import omero
 import Ice
+from omero.gateway import BlitzGateway
 from omero.gateway.scripts import dbhelpers
 import pytest
 
@@ -227,13 +228,15 @@ class TestConnectionMethods(object):
         gatewaywrapper.loginAsAdmin()
         username = "connect_test_user6"
         password = "foobar"
-        connect_test_user = dbhelpers.UserEntry(
-            username, password, firstname='User', lastname='ConnectUsingClient')
-        chmod_test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
+        last_name = "ConnectUsingClient"
+        test_user = dbhelpers.UserEntry(username, password,
+                                        firstname='User',
+                                        lastname=last_name)
+        test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
         gatewaywrapper.doDisconnect()
 
         client = omero.client()
-        client.createSession(user, password)
+        client.createSession(username, password)
         with BlitzGateway(client_obj=client) as conn:
             assert conn.connect(), "Should be connected"
 
@@ -241,60 +244,63 @@ class TestConnectionMethods(object):
         gatewaywrapper.loginAsAdmin()
         username = "connect_test_user7"
         password = "foobar"
-        connect_test_user = dbhelpers.UserEntry(
-            username, password, firstname='User',
-            lastname='ConnectUsingClientNoSessionWithIdentity')
-        chmod_test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
+        last_name = "ConnectUsingClientNoSessionWithIdentity"
+        test_user = dbhelpers.UserEntry(username, password,
+                                        firstname='User',
+                                        lastname=last_name)
+        test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
         gatewaywrapper.doDisconnect()
 
         client = omero.client()
         with BlitzGateway(client_obj=client) as conn:
-            conn.setIdentity(user, password)
+            conn.setIdentity(username, password)
             assert conn.connect(), "Should be connected"
 
     def testConnectUsingClientSessionWithoutIdentity(self, gatewaywrapper):
         gatewaywrapper.loginAsAdmin()
         username = "connect_test_user8"
         password = "foobar"
-        connect_test_user = dbhelpers.UserEntry(
-            username, password, firstname='User',
-            lastname='ConnectUsingClientNoSessionWithoutIdentity')
-        chmod_test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
+        last_name = "ConnectUsingClientSessionWithoutIdentity"
+        test_user = dbhelpers.UserEntry(username, password,
+                                        firstname='User',
+                                        lastname=last_name)
+        test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
         gatewaywrapper.doDisconnect()
 
         client = omero.client()
         with BlitzGateway(client_obj=client) as conn:
-            assert conn.connect() == False
+            assert not conn.connect()
 
     def testSessionId(self, gatewaywrapper):
         gatewaywrapper.loginAsAdmin()
         username = "session_test_user"
         password = "foobar"
-        connect_test_user = dbhelpers.UserEntry(
-            username, password, firstname='User',
-            lastname='sessionId')
-        chmod_test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
+        last_name = "SessionId"
+        test_user = dbhelpers.UserEntry(username, password,
+                                        firstname='User',
+                                        lastname=last_name)
+        test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
         gatewaywrapper.doDisconnect()
 
         client = omero.client()
-        client.createSession(user, password)
+        client.createSession(username, password)
         sid = client.getSessionId()
         with BlitzGateway(client_obj=client) as conn:
-           assert sid == conn.getSession().getUuid().val
-
+            assert sid == conn.getSession().getUuid().val
 
     def testConnectWithSessionId(self, gatewaywrapper):
         gatewaywrapper.loginAsAdmin()
         username = "connect_withsession_test_user"
         password = "foobar"
-        connect_test_user = dbhelpers.UserEntry(
-            username, password, firstname='User',
-            lastname='connect_withsession')
-        chmod_test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
+        last_name = "connect_withsessionId"
+        test_user = dbhelpers.UserEntry(username, password,
+                                        firstname='User',
+                                        lastname=last_name)
+        test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
         gatewaywrapper.doDisconnect()
 
         client = omero.client()
-        client.createSession(user, password)
+        client.createSession(username, password)
         sid = client.getSessionId()
         with BlitzGateway(client_obj=client) as conn:
-          assert conn.connect(sUuid=sid), "Should be connected"
+            assert conn.connect(sUuid=sid), "Should be connected"
