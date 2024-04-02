@@ -306,18 +306,8 @@ class TestConnectionMethods(object):
             assert conn.connect(sUuid=sid), "Should be connected"
 
     def testSecure(self, gatewaywrapper):
-        gatewaywrapper.loginAsAdmin()
-        username = "secure_test_user"
-        password = "foobar"
-        last_name = "secure"
-        test_user = dbhelpers.UserEntry(username, password,
-                                        firstname='User',
-                                        lastname=last_name)
-        test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
-        gatewaywrapper.doDisconnect()
-
-        client = omero.client()
-        client.createSession(username, password)
+        gatewaywrapper.loginAsUser()
+        client = gatewaywrapper.gateway
         assert not client.isSecure()
         with BlitzGateway(client_obj=client, secure=True) as conn:
             assert not conn.isSecure()
