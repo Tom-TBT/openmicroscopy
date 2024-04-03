@@ -314,7 +314,7 @@ class TestConnectionMethods(object):
 
     def testHost(self, gatewaywrapper):
         gatewaywrapper.loginAsUser()
-        client = gatewaywrapper.gateway
+        client = gatewaywrapper.gateway.c
         with pytest.raises(Exception) as ex:
             BlitzGateway(client_obj=client, host="myserver.com")
         assert "do not match" in str(ex.value)
