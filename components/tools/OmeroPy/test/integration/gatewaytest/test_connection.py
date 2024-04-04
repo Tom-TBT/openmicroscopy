@@ -308,9 +308,9 @@ class TestConnectionMethods(object):
     def testSecure(self, gatewaywrapper):
         client = omero.client()
         client.createSession("root", dbhelpers.ROOT.passwd)
-        assert not client.isSecure()
-        with BlitzGateway(client_obj=client, secure=True) as conn:
-            assert not conn.isSecure()
+        assert client.isSecure()
+        with BlitzGateway(client_obj=client) as conn:
+            assert conn.isSecure()
 
     def testHost(self, gatewaywrapper):
         gatewaywrapper.loginAsUser()
