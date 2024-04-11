@@ -305,12 +305,20 @@ class TestConnectionMethods(object):
         with BlitzGateway(client_obj=client) as conn:
             assert conn.connect(sUuid=sid), "Should be connected"
 
-    def testSecure(self, gatewaywrapper):
+    def testSecureWithClient(self, gatewaywrapper):
         client = omero.client()
         client.createSession("root", dbhelpers.ROOT.passwd)
         assert client.isSecure()
         with BlitzGateway(client_obj=client) as conn:
             assert conn.isSecure()
+
+    def testSecureMisMatch(self, gatewaywrapper):
+        client = omero.client()
+        client.createSession("root", dbhelpers.ROOT.passwd)
+        assert client.isSecure()
+        with pytest.raises(Exception) as ex:
+            BlitzGateway(client_obj=client, secure=False)
+        assert "do not match" in str(ex.value)
 
     def testHost(self, gatewaywrapper):
         gatewaywrapper.loginAsUser()
