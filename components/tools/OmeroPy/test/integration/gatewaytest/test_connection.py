@@ -305,12 +305,59 @@ class TestConnectionMethods(object):
         with BlitzGateway(client_obj=client) as conn:
             assert conn.connect(sUuid=sid), "Should be connected"
 
-    def testSecureWithClient(self, gatewaywrapper):
+    def testSecureWithSecureClient(self, gatewaywrapper):
         client = omero.client()
         client.createSession("root", dbhelpers.ROOT.passwd)
         assert client.isSecure()
         with BlitzGateway(client_obj=client) as conn:
             assert conn.isSecure()
+            assert conn.c.isSecure()
+            assert conn.secure
+            conn.setSecure(False)
+            assert not conn.isSecure()
+            assert not conn.c.isSecure()
+            assert not conn.secure
+
+    def testSecureWithUnsecureClient(self, gatewaywrapper):
+        client = omero.client()
+        client.createSession("root", dbhelpers.ROOT.passwd)
+        assert client.isSecure()
+        unsecure_client = client.createClient(secure=False)
+        client.__del__()
+
+        with BlitzGateway(client_obj=unsecure_client) as conn:
+            assert not conn.isSecure()
+            assert not conn.c.isSecure()
+            assert not conn.secure
+            conn.setSecure(True)
+            assert conn.isSecure()
+            assert conn.c.isSecure()
+            assert conn.secure
+
+    @pytest.mark.parametrize("secure", [None, "False", "True"])
+    def testSecureWithUsername(self, gatewaywrapper, secure):
+
+        with BlitzGateway(username="root",
+                          passwd=dbhelpers.ROOT.passwd,
+                          host="localhost",
+                          secure=secure) as conn:
+            conn.connect()
+            if secure:
+                assert conn.isSecure()
+                assert conn.c.isSecure()
+                assert conn.secure
+                conn.setSecure(False)
+                assert not conn.isSecure()
+                assert not conn.c.isSecure()
+                assert not conn.secure
+            else:
+                assert not conn.isSecure()
+                assert not conn.c.isSecure()
+                assert not conn.secure
+                conn.setSecure(True)
+                assert conn.isSecure()
+                assert conn.c.isSecure()
+                assert conn.secure
 
     def testSecureMisMatch(self, gatewaywrapper):
         client = omero.client()
