@@ -336,21 +336,11 @@ class TestConnectionMethods(object):
 
     @pytest.mark.parametrize("secure", [None, "False", "True"])
     def testSecureWithUsername(self, gatewaywrapper, secure):
-
-        gatewaywrapper.loginAsAdmin()
-        username = "session_test_secure_with_name"
-        password = "foobar"
-        last_name = "SessionId"
-        test_user = dbhelpers.UserEntry(username, password,
-                                        firstname='User',
-                                        lastname=last_name)
-        test_user.create(gatewaywrapper.gateway, dbhelpers.ROOT.passwd)
-        gatewaywrapper.doDisconnect()
-
-        with BlitzGateway(username=username,
-                          passwd=password,
-                          host="localhost",
-                          secure=secure) as conn:
+        try:
+            conn = BlitzGateway(username="root",
+                                passwd=dbhelpers.ROOT.passwd,
+                                host="localhost",
+                                secure=secure)
             conn.connect()
             if secure:
                 assert conn.isSecure()
@@ -368,6 +358,7 @@ class TestConnectionMethods(object):
                 assert conn.isSecure()
                 assert conn.c.isSecure()
                 assert conn.secure
+        finally:
             conn.close()
 
     def testSecureMisMatch(self, gatewaywrapper):
