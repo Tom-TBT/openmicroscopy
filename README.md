@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/ome/openmicroscopy/workflows/OMERO/badge.svg)](https://github.com/ome/openmicroscopy/actions)
+[![Actions Status](https://github.com/ome/openmicroscopy/workflows/Build/badge.svg)](https://github.com/ome/openmicroscopy/actions)
 
 Also see [CONTRIBUTING.md](./CONTRIBUTING.md) and [SUPPORT.md](./SUPPORT.md)
 
