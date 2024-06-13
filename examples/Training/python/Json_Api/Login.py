@@ -35,9 +35,12 @@ projects_url = urls['url:projects']
 save_url = urls['url:save']
 schema_url = urls['url:schema']
 
-# To login we need to get CSRF token
+# To login we need to get CSRF token from cookie
 token_url = urls['url:token']
-token = session.get(token_url).json()['data']
+# we need to trigger the creation of csrf token with this URL
+session.get(token_url)
+# but the token we want is accessed as a cookie
+token = session.cookies.get_dict().get("csrftoken")
 print('CSRF token', token)
 # We add this to our session header
 # Needed for all POST, PUT, DELETE requests
