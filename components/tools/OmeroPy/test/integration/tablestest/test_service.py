@@ -714,4 +714,40 @@ class TestTables(ITest):
         table.delete()
         table.close()
 
+    def tesIncludeRowNumbers(self):
+        grid = self.client.sf.sharedResources()
+        table = grid.newTable(1, "/testIncludeRowNumbers")
+        assert table
+
+        lc = columns.LongColumnI('lc', 'desc', [1, 2, 3, 4, 5])
+        table.initialize([lc])
+        table.addData([lc])
+
+        colNumbers = [0]
+        rowNumbers = [0, 1, 2, 3, 4]
+        # Check that row numbers come back when defaulting to "true"
+        data = table.slice(colNumbers, rowNumbers)
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 5 == len(data.rowNumbers)
+
+        # Check that row numbers come back when explicitly stating "true"
+        data = table.slice(
+            colNumbers, rowNumbers, {
+                'omero.tables.include_row_numbers': "true"
+            }
+        )
+        assert 5 == len(data.rowNumbers)
+
+        # Check that no row numbers come back when explicitly stating "false"
+        data = table.slice(
+            colNumbers, rowNumbers, {
+                'omero.tables.include_row_numbers': "false"
+            }
+        )
+        assert 0 == len(data.rowNumbers)
+
+        table.delete()
+        table.close()
+
 # TODO: Add tests for error conditions
