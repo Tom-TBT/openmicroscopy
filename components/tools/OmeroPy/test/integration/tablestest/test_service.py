@@ -714,7 +714,7 @@ class TestTables(ITest):
         table.delete()
         table.close()
 
-    def tesIncludeRowNumbers(self):
+    def testIncludeRowNumbers(self):
         grid = self.client.sf.sharedResources()
         table = grid.newTable(1, "/testIncludeRowNumbers")
         assert table
