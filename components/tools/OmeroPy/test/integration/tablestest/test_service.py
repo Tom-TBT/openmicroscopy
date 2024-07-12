@@ -714,4 +714,106 @@ class TestTables(ITest):
         table.delete()
         table.close()
 
+    @pytest.fixture(scope='function')
+    def singleColumnFiveRowTable(self):
+        grid = self.client.sf.sharedResources()
+        table = grid.newTable(1, "/testIncludeRowNumbers")
+        assert table
+
+        lc = columns.LongColumnI('lc', 'desc', [1, 2, 3, 4, 5])
+        table.initialize([lc])
+        table.addData([lc])
+
+        yield table
+
+        table.delete()
+        table.close()
+
+    def testIncludeRowNumbersSlice(self, singleColumnFiveRowTable):
+        colNumbers = [0]
+        rowNumbers = [0, 1, 2, 3, 4]
+        # Check that row numbers come back when defaulting to "true"
+        data = singleColumnFiveRowTable.slice(colNumbers, rowNumbers)
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 5 == len(data.rowNumbers)
+
+        # Check that row numbers come back when explicitly stating "true"
+        data = singleColumnFiveRowTable.slice(
+            colNumbers, rowNumbers, {
+                'omero.tables.include_row_numbers': "true"
+            }
+        )
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 5 == len(data.rowNumbers)
+
+        # Check that no row numbers come back when explicitly stating "false"
+        data = singleColumnFiveRowTable.slice(
+            colNumbers, rowNumbers, {
+                'omero.tables.include_row_numbers': "false"
+            }
+        )
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 0 == len(data.rowNumbers)
+
+    def testIncludeRowNumbersReadCoordinates(self, singleColumnFiveRowTable):
+        rowNumbers = [0, 1, 2, 3, 4]
+        # Check that row numbers come back when defaulting to "true"
+        data = singleColumnFiveRowTable.readCoordinates(rowNumbers)
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 5 == len(data.rowNumbers)
+
+        # Check that row numbers come back when explicitly stating "true"
+        data = singleColumnFiveRowTable.readCoordinates(
+            rowNumbers, {
+                'omero.tables.include_row_numbers': "true"
+            }
+        )
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 5 == len(data.rowNumbers)
+
+        # Check that no row numbers come back when explicitly stating "false"
+        data = singleColumnFiveRowTable.readCoordinates(
+            rowNumbers, {
+                'omero.tables.include_row_numbers': "false"
+            }
+        )
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 0 == len(data.rowNumbers)
+
+    def testIncludeRowNumbersRead(self, singleColumnFiveRowTable):
+        colNumbers = [0]
+        start = 0
+        stop = 5
+        # Check that row numbers come back when defaulting to "true"
+        data = singleColumnFiveRowTable.read(colNumbers, start, stop)
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 5 == len(data.rowNumbers)
+
+        # Check that row numbers come back when explicitly stating "true"
+        data = singleColumnFiveRowTable.read(
+            colNumbers, start, stop, {
+                'omero.tables.include_row_numbers': "true"
+            }
+        )
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 5 == len(data.rowNumbers)
+
+        # Check that no row numbers come back when explicitly stating "false"
+        data = singleColumnFiveRowTable.read(
+            colNumbers, start, stop, {
+                'omero.tables.include_row_numbers': "false"
+            }
+        )
+        assert 1 == len(data.columns)
+        assert 5 == len(data.columns[0].values)
+        assert 0 == len(data.rowNumbers)
+
 # TODO: Add tests for error conditions
